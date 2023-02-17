@@ -2,17 +2,20 @@
 import GraphManager from "../GraphManager.mjs";
 import PriorityQueue from "./PriorityQueue.mjs";
 
-export default class Dijkstra
+export default class Astar
 {
     start;
     target;
     graph;
 
+    heuristic;
+
     cameFrom;
     costSoFar;
+    fScore;
     frontier;
 
-    constructor(start, target, graph)
+    constructor(start, target, graph, heuristic)
     {
         this.start = start;
 
@@ -20,8 +23,14 @@ export default class Dijkstra
 
         this.graph = graph;
 
+        this.heuristic = heuristic;
+
         //initialize costSoFar
-        this.costSoFar = new Map([...graph.keys()].map(el => [el, 0]));
+        this.costSoFar = new Map(); // [...graph.keys()].map(el => [el, 0]));   
+        this.costSoFar.set(start, 0);
+
+        this.fScore = new Map();
+        this.fScore.set(start, 0)
 
         this.frontier = new PriorityQueue(this.costSoFar);
 
@@ -36,7 +45,7 @@ export default class Dijkstra
 
     search()
     {
-        const {frontier, costSoFar, cameFrom, heuristic, start, target, graph} = this;
+        const {frontier, costSoFar, cameFrom, fScore, start, target, graph} = this;
 
         frontier.insert(start);
 
@@ -61,8 +70,11 @@ export default class Dijkstra
                     // set or update the cost
                     costSoFar.set(neighbor, newCost);
 
-                    // set as visited / update the path portion
+                    // mark as visited / update the path portion
                     cameFrom.set(neighbor, currentNode);
+
+                    // different
+                    fScore.set(neighbor, newCost + this.heuristic(neighbor, target));
 
                     // update frontier determine priority
                     betterCost? frontier.reorderUpFrom(neighbor) : frontier.insert(neighbor)
@@ -75,6 +87,8 @@ export default class Dijkstra
 
     getPath()
     {
+        // console.log("AStar SIZE:", this.fScore.size);
+
         const path = [];
 
         let {target: currNode} = this;
@@ -113,10 +127,14 @@ export default class Dijkstra
         this.costSoFar.clear();
         this.costSoFar = undefined;
 
+        this.heuristic = undefined;
+
+        this.fScore.clear();
+        this.fScore = undefined;
+
         this.cameFrom.clear();
         this.cameFrom = undefined;
 
-        this.heuristic = undefined;
         this.start = undefined;
         this.target = undefined;
 
