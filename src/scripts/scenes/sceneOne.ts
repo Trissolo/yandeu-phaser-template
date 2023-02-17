@@ -62,7 +62,7 @@ export default class SceneOne extends Phaser.Scene
 
 
         
-        this.input.keyboard.on("keydown-Z", () => { this.text?.setText("Key 'Z'"); });
+        this.input.keyboard.on("keydown-Z", this.pressedZ, this); // () => { this.text?.setText("Key 'Z'"); });
 
         this.input.on('pointerdown', this.onClick, this);
     }
@@ -71,7 +71,7 @@ export default class SceneOne extends Phaser.Scene
     {
         if (pointer.middleButtonDown())
         {
-            this.text?.setText("Middle click");
+            this.text?.setText("Middle click").setDepth(9);
 
             this.player.setPosition(pointer.worldX, pointer.worldY);
 
@@ -105,5 +105,21 @@ export default class SceneOne extends Phaser.Scene
         {
             this.text?.setText("Left click");
         }
+    }
+
+    pressedZ()
+    {
+        const testAStarPath = this.pmstroll.pathAStar(this.player, this.dest, this.vismap);
+
+            console.dir("SceneA ASTAR!:", testAStarPath);
+
+            // just show the path
+            if(testAStarPath.length)
+            {
+
+            // this.pmstroll.debug.graphics.clear();
+
+            this.pmstroll.debug?.showPath(testAStarPath, 0x45b8a9);
+            }
     }
 } // end class
