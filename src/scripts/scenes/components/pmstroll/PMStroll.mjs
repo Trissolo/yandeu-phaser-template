@@ -21,6 +21,7 @@ const {GetMidPoint} = Phaser.Geom.Line;
 const {LineToLine} = Phaser.Geom.Intersects;
 
 import Dijkstra from "./pathfinding/Dijkstra.mjs";
+import AStar from "./pathfinding/AStar.mjs";
 
 export default class PMStroll
 {
@@ -244,7 +245,7 @@ export default class PMStroll
 
         const clonedGraph = this.prepareGraph(start, end, polygonalMap);
 
-        return new Dijkstra(start, end, clonedGraph).getPath()
+        return new Dijkstra(start, end, clonedGraph).getPath();
                         // .search()
                         // .getPath()
 
@@ -262,5 +263,16 @@ export default class PMStroll
 
 
     }  // end pathDijkstra
+
+    pathAStar(start, end, polygonalMap)
+    {
+        start = vector2LikeFromObject(start);
+        end = vector2LikeFromObject(end);
+
+        const clonedGraph = this.prepareGraph(start, end, polygonalMap);
+
+        return new AStar(start, end, clonedGraph, heuristic).getPath();
+
+    } // end pathAStar
 
 }
