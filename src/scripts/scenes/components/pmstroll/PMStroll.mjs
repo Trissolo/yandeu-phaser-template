@@ -20,6 +20,8 @@ const {BetweenPoints: heuristic} = Phaser.Math.Distance;
 const {GetMidPoint} = Phaser.Geom.Line;
 const {LineToLine} = Phaser.Geom.Intersects;
 
+import Dijkstra from "./pathfinding/Dijkstra.mjs";
+
 export default class PMStroll
 {
     // optional
@@ -138,10 +140,10 @@ export default class PMStroll
         const ray = new Phaser.Geom.Line();
         setLineFromVectors(ray, start, end);
 
-
         //One side of current polygon
         const polygonSide = new Phaser.Geom.Line();
 
+        // temp Vector2
         const tempVec2 = new Phaser.Math.Vector2()
 
         for (const {points} of polygonalMap.polygons)
@@ -183,5 +185,82 @@ export default class PMStroll
         return (recycledVec.setFromObject(rayA, this.epsilon).fuzzyEquals(sideA, this.epsilon) || recycledVec.setFromObject(rayB).fuzzyEquals(sideB, this.epsilon)) || (recycledVec.setFromObject(rayB).fuzzyEquals(sideA, this.epsilon) || recycledVec.setFromObject(rayA).fuzzyEquals(sideB, this.epsilon));
     }
 
+    addExtraNodeToClonedGraph(extraNode, clonedGraph, graphKeys, limit, originalPolygonalMap)
+    {
+        GraphManager.addNode(extraNode, clonedGraph);
+
+        for (let i = 0; i < limit; i++)
+        {
+            const node = graphKeys[i];
+
+            if (this.quickInLineOfSight(extraNode, node, originalPolygonalMap))
+            {
+                GraphManager.addEdge(extraNode, node, heuristic(extraNode, node), clonedGraph);
+            }
+        }
+
+        //just in case...
+        return clonedGraph
+    }
+
+    prepareGraph(start, end, polygonalMap)
+    {
+        // 1) Clone the Graph:
+        const clonedGraph = GraphManager.cloneGraph(polygonalMap.graph);
+
+        // console.log("Current clonedGraph size", clonedGraph.size)
+
+        // 2) Extract the Keys (extract the keys, which are used to create the edges of the new node):
+        const graphKeys = [...clonedGraph.keys()];
+
+        // 3) the highest node index - when creating edges you don't need to go further
+        let {length} = graphKeys;
+
+        // 4) Add and connect the new Node
+        this.addExtraNodeToClonedGraph(start, clonedGraph, graphKeys, length, polygonalMap);
+
+        // console.log("Current clonedGraph size after:", clonedGraph.size);
+
+        // 5) Before add the second new node update the Keys and 'length'
+        graphKeys.push(start);
+
+        //6) 'length'
+        length += 1;
+
+        // 7) Add the 'end' node
+        this.addExtraNodeToClonedGraph(end, clonedGraph, graphKeys, length, polygonalMap);
+
+        // console.log("Current clonedGraph size after adding the second node:", clonedGraph);
+        // this.debug.showGraph(clonedGraph);
+
+        //done!
+        return clonedGraph
+    }
+
+    pathDijkstra(start, end, polygonalMap)
+    {
+        start = vector2LikeFromObject(start);
+        end = vector2LikeFromObject(end);
+
+        const clonedGraph = this.prepareGraph(start, end, polygonalMap);
+
+        return new Dijkstra(start, end, clonedGraph).getPath()
+                        // .search()
+                        // .getPath()
+
+        
+        // const finder = new Dijkstra(start, end, clonedGraph).search().getPath()
+
+        // finder.search();
+
+        // const path = finder.getPath();
+
+        // console.log(finder, path);
+
+        // return finder //path
+        // return finder.getPath();
+
+
+    }  // end pathDijkstra
 
 }
