@@ -58,6 +58,25 @@ export default class PMDebug
 		}
 	}
 
+    showGraph(graph)
+    {
+        this.graphics.clear()
+        for(const [node, edges] of graph)
+        {
+            for(const [neigh, qwe] of edges)
+            {
+                this.lineFromVecs(node, neigh);
+            }
+        }
+    }
+
+    showPath(vecAry, color = 0xffff99)
+	{
+		// this.setLineColor(color);
+        this.graphics.lineStyle(2, color, 1)
+        this.graphics.strokePoints(vecAry, false, false);
+	}
+
     drawPolyMap(polygonalMap)
     {
 
