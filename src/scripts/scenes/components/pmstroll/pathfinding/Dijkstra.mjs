@@ -36,7 +36,7 @@ export default class Dijkstra
 
     search()
     {
-        const {frontier, costSoFar, cameFrom, heuristic, start, target, graph} = this;
+        const {frontier, costSoFar, cameFrom, start, target, graph} = this;
 
         frontier.insert(start);
 
@@ -61,7 +61,7 @@ export default class Dijkstra
                     // set or update the cost
                     costSoFar.set(neighbor, newCost);
 
-                    // set as visited / update the path portion
+                    // mark as visited / update the path portion
                     cameFrom.set(neighbor, currentNode);
 
                     // update frontier determine priority
@@ -75,6 +75,8 @@ export default class Dijkstra
 
     getPath()
     {
+        // console.log("Dijkstra SIZE:", this.costSoFar.size);
+
         const path = [];
 
         let {target: currNode} = this;
@@ -116,7 +118,6 @@ export default class Dijkstra
         this.cameFrom.clear();
         this.cameFrom = undefined;
 
-        this.heuristic = undefined;
         this.start = undefined;
         this.target = undefined;
 
