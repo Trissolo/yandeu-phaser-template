@@ -1,6 +1,7 @@
 import 'phaser';
 import SceneOne from './scenes/sceneOne';
 import PreloadScene from './scenes/preloadScene'
+import Inventory from './scenes/Inventory';
 
 const config = {
   type: Phaser.WEBGL,
@@ -18,7 +19,7 @@ const config = {
   loader: {
       path: 'assets/'
   },
-  scene: [PreloadScene, SceneOne]
+  scene: Inventory //[PreloadScene, SceneOne]
 };
 
 window.addEventListener('load', () => {
