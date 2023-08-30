@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 
-// import PMStroll from './components/pmstroll/PMStroll.mjs';
-// import VisibilityMap from './components/pmstroll/VisibilityMap.mjs';
+import GameItem from './sceneStuff/GameItemType.js';
+
+import GameItems from './sceneStuff/GameItems.mjs';
 
 
 export default class Inventory extends Phaser.Scene
@@ -12,7 +13,7 @@ export default class Inventory extends Phaser.Scene
 
     text: Phaser.GameObjects.BitmapText;
 
-    gag : String = "gag! Inv";
+    gag : GameItem = GameItems.get(4); // String = "gag! Inv";
 
     immy: Phaser.GameObjects.Image;
 
@@ -23,8 +24,8 @@ export default class Inventory extends Phaser.Scene
 
     preload()
     {
-        this.load.atlas("itemsAtlas", "img/inv_atlas_test.png", "img/inv_atlas_test.json")
-        this.load.xml('tinyNumbersXML', 'img/font_inv.xml');
+        this.load.atlas("itemsAtlas", "inv_atlas_test.png", "inv_atlas_test.json")
+        this.load.xml('tinyNumbersXML', 'font_inv.xml');
         this.load.once('complete', () => { Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'tinyNumbers', 'itemsAtlas', 'font_inv', 'tinyNumbersXML');})
     }
   
@@ -32,13 +33,15 @@ export default class Inventory extends Phaser.Scene
     {
         this.text = this.add.bitmapText(4, 8, "tinyNumbers", "1%23409").setOrigin(0);
 
-        this.add.image(24, 35, 'itemsAtlas', "veg15");
+        this.add.image(24, 35, 'itemsAtlas', this.gag.frame);
 
         // this.player = this.add.triangle(11, 118, 4, 16, 0, 0, 8, 0, 0xbbbb88)//0xdb78ca)
         //     .setOrigin(0.5, 1)
         //     .setDepth(2);
 
         console.log(this.gag);
+
+        console.dir(GameItems);
         // this.input.keyboard.on("keydown-Z", this.pressedZ, this); // () => { this.text?.setText("Key 'Z'"); });
 
        

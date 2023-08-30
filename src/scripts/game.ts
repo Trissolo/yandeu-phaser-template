@@ -1,6 +1,8 @@
 import 'phaser';
-import SceneOne from './scenes/sceneOne';
-import PreloadScene from './scenes/preloadScene'
+
+// import SceneOne from './scenes/sceneOne';
+// import PreloadScene from './scenes/preloadScene'
+
 import Inventory from './scenes/Inventory';
 
 const config = {
@@ -17,9 +19,9 @@ const config = {
     // autoCenter: Phaser.Scale.CENTER_BOTH
   },
   loader: {
-      path: 'assets/'
+      path: 'assets/img'
   },
-  scene: Inventory //[PreloadScene, SceneOne]
+  scene: Inventory
 };
 
 window.addEventListener('load', () => {
