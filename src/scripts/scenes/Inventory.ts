@@ -9,9 +9,9 @@ import GameItems from './sceneStuff/GameItems.mjs';
 
 export default class Inventory extends Phaser.Scene
 {
-    itemsPerRow:number = 7;
+    itemsPerRow:number = 4;
 
-    rowAmount:number = 2;
+    rowAmount:number = 3;
 
     slotsAmount:number = this.itemsPerRow * this.rowAmount;
 
@@ -75,8 +75,8 @@ export default class Inventory extends Phaser.Scene
         // console.log(this.gag);
 
         // this.inventory.set(GameItems.get(22), 2);
-        this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
-        this.addMultiple(Phaser.Utils.Array.NumberArray(0, GameItems.size -1); // this.itemsPerRow));
+        // this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, GameItems.size - 1)); // this.itemsPerRow));
 
         console.log("INVEEEEEEEEEEEEEEEEEE:", this.inventory);
 
@@ -138,6 +138,8 @@ export default class Inventory extends Phaser.Scene
 
         let x = 0;
         let y = 0;
+
+        const maxX = distance * itemsPerRow;
         let item;
         let owned;
 
@@ -147,7 +149,9 @@ export default class Inventory extends Phaser.Scene
 
         for (let slot = 0; slot < limit; slot++)
         {
-            if (slot === itemsPerRow)
+            console.log(`Drawing slot# ${slot} of ${limit}`);
+
+            if (x === maxX) //slot === itemsPerRow)
             {
                 x = 0;
                 y += distance;
@@ -172,6 +176,7 @@ export default class Inventory extends Phaser.Scene
             }
 
             x+= distance;
+            // console.log(x);
         }
 
         dynTexture.endDraw();
@@ -183,7 +188,7 @@ export default class Inventory extends Phaser.Scene
         console.log("Inventory.size:", this.inventory.size)
         // console.log("MaxY", this.inventory.size - this.startingCol * this.itemsPerRow - this.itemsPerRow);
 
-        const maxStartingCol = Math.max(0, Math.ceil(this.inventory.size / this.itemsPerRow) - 1);
+        const maxStartingCol = Math.max(0, Math.ceil(this.inventory.size / this.itemsPerRow) - this.rowAmount);
         console.log("MaxY", maxStartingCol);
         return maxStartingCol;
     }
