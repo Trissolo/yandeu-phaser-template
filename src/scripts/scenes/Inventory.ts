@@ -75,7 +75,7 @@ export default class Inventory extends Phaser.Scene
         // console.log(this.gag);
 
         // this.inventory.set(GameItems.get(22), 2);
-        this.addItem(4, 21).addMultiple([0,1,2,3,5]).loseItem(4);
+        this.addItem(4, 21).addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
 
         console.log("INVEEEEEEEEEEEEEEEEEE:", this.inventory);
 
@@ -106,7 +106,10 @@ export default class Inventory extends Phaser.Scene
 
         this.marker = this.marker = this.add.image(3, this.offset, 'itemsAtlas', "inventory_selected_item")
                      .setOrigin(0)
-                     //.setVisible(false);
+                     .setVisible(false);
+
+
+        this.drawItems();
 
         // this.input.keyboard.on("keydown-Z", this.pressedZ, this); // () => { this.text?.setText("Key 'Z'"); });
 
@@ -117,24 +120,80 @@ export default class Inventory extends Phaser.Scene
 
     drawItems()
     {
-        
+        const {startingCol, distance, slotsAmount, itemsPerRow, dynTexture, amountText, inventory} = this;
+
+        dynTexture.clear();
+
+        const invAry = [...inventory.keys()];
+
+        console.log("invAry!!!!!!!!!!!!!!!!", invAry);
+
+        //dynTexture.clear();
+
+        dynTexture.fill(0x33dd55, 0.6);
+
+        dynTexture.beginDraw()
+
+
+        let x = 0;
+        let y = 0;
+        let item;
+        let owned;
+
+        //hmmm limit
+        const limit = Math.min(slotsAmount, inventory.size - itemsPerRow * startingCol);
+        console.log("(limit:)", limit);
+
+        for (let slot = 0; slot < limit; slot++)
+        {
+            if (slot === itemsPerRow)
+            {
+                x = 0;
+                y += distance;
+            }
+
+            item = invAry[startingCol * itemsPerRow + slot];
+
+            console.log(item);
+
+            // if(item === undefined) {break}
+
+            dynTexture.batchDrawFrame('itemsAtlas', item.frame, x, y);
+
+            owned = inventory.get(item);
+
+            // console.log("How many?", inventory.get(item));
+
+            if (owned > 1)
+            {
+                amountText.setText(owned);
+                dynTexture.batchDraw(amountText, x + distance, y + distance - this.gap);
+            }
+
+            x+= distance;
+        }
+
+        dynTexture.endDraw();
     }
 
     clickedArrow()
     {
         // arrowUp has state===0, arrowDown has state === 1
-        // if (this.state === 0)
-        // {
+        if (this.state === 0)
+        {
+            console.log("Arrow UP");
         // this.scene.decCol()
         // this.scene.setSlots()
         // this.scene.marker.y += this.scene.distance
-        // }
-        // else
-        // {
+        }
+        else
+        {
+            console.log("Arrow Down");
+
         // this.scene.incCol()
         // this.scene.setSlots()
         // this.scene.marker.y -= this.scene.distance
-        // }
+        }
     }
 
     arrowOvered()
