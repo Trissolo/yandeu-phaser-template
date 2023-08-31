@@ -75,8 +75,8 @@ export default class Inventory extends Phaser.Scene
         // console.log(this.gag);
 
         // this.inventory.set(GameItems.get(22), 2);
-        // this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
-        this.addMultiple(Phaser.Utils.Array.NumberArray(0, 3); // this.itemsPerRow));
+        this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, GameItems.size -1); // this.itemsPerRow));
 
         console.log("INVEEEEEEEEEEEEEEEEEE:", this.inventory);
 
@@ -183,7 +183,7 @@ export default class Inventory extends Phaser.Scene
         console.log("Inventory.size:", this.inventory.size)
         // console.log("MaxY", this.inventory.size - this.startingCol * this.itemsPerRow - this.itemsPerRow);
 
-        const maxStartingCol = Math.ceil(this.inventory.size / this.itemsPerRow) - 1;
+        const maxStartingCol = Math.max(0, Math.ceil(this.inventory.size / this.itemsPerRow) - 1);
         console.log("MaxY", maxStartingCol);
         return maxStartingCol;
     }
