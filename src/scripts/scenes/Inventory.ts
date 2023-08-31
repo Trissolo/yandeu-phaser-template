@@ -75,7 +75,8 @@ export default class Inventory extends Phaser.Scene
         // console.log(this.gag);
 
         // this.inventory.set(GameItems.get(22), 2);
-        this.addItem(4, 21).addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
+        // this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, 3); // this.itemsPerRow));
 
         console.log("INVEEEEEEEEEEEEEEEEEE:", this.inventory);
 
@@ -126,7 +127,7 @@ export default class Inventory extends Phaser.Scene
 
         const invAry = [...inventory.keys()];
 
-        console.log("invAry!!!!!!!!!!!!!!!!", invAry);
+        // console.log("invAry!!!!!!!!!!!!!!!!", invAry);
 
         //dynTexture.clear();
 
@@ -142,7 +143,7 @@ export default class Inventory extends Phaser.Scene
 
         //hmmm limit
         const limit = Math.min(slotsAmount, inventory.size - itemsPerRow * startingCol);
-        console.log("(limit:)", limit);
+        // console.log("(limit:)", limit);
 
         for (let slot = 0; slot < limit; slot++)
         {
@@ -154,7 +155,7 @@ export default class Inventory extends Phaser.Scene
 
             item = invAry[startingCol * itemsPerRow + slot];
 
-            console.log(item);
+            // console.log(item);
 
             // if(item === undefined) {break}
 
@@ -176,12 +177,26 @@ export default class Inventory extends Phaser.Scene
         dynTexture.endDraw();
     }
 
+    maxY()
+    {
+        // return Math.max(0, Math.floor( (this.getInv().length - 1) / this.itemsPerRow) - 1);
+        console.log("Inventory.size:", this.inventory.size)
+        // console.log("MaxY", this.inventory.size - this.startingCol * this.itemsPerRow - this.itemsPerRow);
+
+        const maxStartingCol = Math.ceil(this.inventory.size / this.itemsPerRow) - 1;
+        console.log("MaxY", maxStartingCol);
+        return maxStartingCol;
+    }
+
     clickedArrow()
     {
+        console.log("Current StartingCol", this.scene.startingCol, this.state);
+
         // arrowUp has state===0, arrowDown has state === 1
         if (this.state === 0)
         {
             console.log("Arrow UP");
+            this.scene.startingCol = Math.max(0, this.scene.startingCol - 1)
         // this.scene.decCol()
         // this.scene.setSlots()
         // this.scene.marker.y += this.scene.distance
@@ -189,11 +204,14 @@ export default class Inventory extends Phaser.Scene
         else
         {
             console.log("Arrow Down");
-
+            this.scene.startingCol = Math.min(this.scene.startingCol + 1 , this.scene.maxY())
         // this.scene.incCol()
         // this.scene.setSlots()
         // this.scene.marker.y -= this.scene.distance
         }
+
+        console.log("Drawing.from:", this.scene.startingCol);
+        this.scene.drawItems();
     }
 
     arrowOvered()
