@@ -9,7 +9,7 @@ import GameItems from './sceneStuff/GameItems.mjs';
 
 export default class Inventory extends Phaser.Scene
 {
-    itemsPerRow:number = 4;
+    itemsPerRow:number = 7;
 
     rowAmount:number = 3;
 
@@ -31,8 +31,10 @@ export default class Inventory extends Phaser.Scene
 
     offset:number = 3;
 
+    // ratio
+    percent:number = this.itemFrameSide / this.distance;
 
-
+    // game objects:
     marker: Phaser.GameObjects.Image;
 
     arrowUp: Phaser.GameObjects.Image;
@@ -86,7 +88,10 @@ export default class Inventory extends Phaser.Scene
 
         this.dynTexture = this.textures.addDynamicTexture("DT", this.itemsPerRow * this.distance, this.rowAmount * this.distance).fill(0x33dd55, 0.6);
 
-        this.immy = this.add.image(3, 3, 'DT').setOrigin(0);
+        this.immy = this.add.image(this.offset, this.offset, 'DT')
+            .setOrigin(0)
+            .setInteractive()
+            .on('pointerdown', this.withoutRemainder);
 
         this.arrowUp = this.add.image(248, 9, 'itemsAtlas', "inventory_arrow_up")
                       .setInteractive()
@@ -175,7 +180,7 @@ export default class Inventory extends Phaser.Scene
                 dynTexture.batchDraw(amountText, x + distance, y + distance - this.gap);
             }
 
-            x+= distance;
+            x += distance;
             // console.log(x);
         }
 
@@ -271,6 +276,41 @@ export default class Inventory extends Phaser.Scene
         // {
 
         // }
+    }
+
+    withoutRemainder(pointer, relX, relY, d)
+    {
+        const {itemsPerRow, rowAmount, percent, distance} = this.scene;
+    
+            //testing:
+            //rx = 26.1;
+            //ry = 26.1;
+            //
+
+            const rx = relX / distance;
+            const ry = relY / distance;
+
+            const gridX = Math.floor(rx);
+            const gridY = Math.floor(ry);
+            
+            console.log("---TEST---", arguments);
+            console.log(`relX: ${relX}\nrelY: ${relY}`);
+            console.log(`gridX: ${gridX}\ngridY: ${gridY}`);
+
+            console.log(`alloX: ${rx - gridX}\nalloY: ${ry - gridY}`);
+
+
+
+        //  Allow interaction if click coordinates are within the cell area - ...no effect if a gap was clicked.
+        if (rx - gridX <= percent && ry - gridY <= percent)
+        {
+            const cell = gridX + gridY * itemsPerRow ;
+
+            const realCell = cell + this.scene.startingCol * itemsPerRow;
+
+            console.log(`%cCell %c ${cell} %c(${realCell})`, "background-color: #337;", "color: #dd7;background-color: #557;", "color: #dd7;");
+
+        }
     }
     
 
