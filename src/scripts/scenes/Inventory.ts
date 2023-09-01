@@ -11,7 +11,7 @@ export default class Inventory extends Phaser.Scene
 {
     itemsPerRow:number = 7;
 
-    rowAmount:number = 3;
+    rowAmount:number = 2;
 
     slotsAmount:number = this.itemsPerRow * this.rowAmount;
 
@@ -50,6 +50,8 @@ export default class Inventory extends Phaser.Scene
     dynTexture: any | null; //Phaser.Textures.DynamicTexture | any | null | undefined;
 
     inventory = new Map<GameItem, number>();
+
+    currentItem = null;
 
 
     constructor ()
@@ -116,8 +118,9 @@ export default class Inventory extends Phaser.Scene
 
 
         this.drawItems();
+        this.setArrowVisibility();
 
-        // this.input.keyboard.on("keydown-Z", this.pressedZ, this); // () => { this.text?.setText("Key 'Z'"); });
+        this.input.keyboard.on("keydown-Z", this.pressedZ, this);
 
         
 
@@ -206,7 +209,8 @@ export default class Inventory extends Phaser.Scene
         if (this.state === 0)
         {
             console.log("Arrow UP");
-            this.scene.startingCol = Math.max(0, this.scene.startingCol - 1)
+            this.scene.startingCol = Math.max(0, this.scene.startingCol - 1);
+            this.scene.marker.y += this.scene.distance;
         // this.scene.decCol()
         // this.scene.setSlots()
         // this.scene.marker.y += this.scene.distance
@@ -214,14 +218,23 @@ export default class Inventory extends Phaser.Scene
         else
         {
             console.log("Arrow Down");
-            this.scene.startingCol = Math.min(this.scene.startingCol + 1 , this.scene.maxY())
+            this.scene.startingCol = Math.min(this.scene.startingCol + 1 , this.scene.maxY());
+            this.scene.marker.y -= this.scene.distance;
         // this.scene.incCol()
         // this.scene.setSlots()
         // this.scene.marker.y -= this.scene.distance
         }
 
-        console.log("Drawing.from:", this.scene.startingCol);
+        console.log("Drawing.from:", this.scene.startingCol, this.scene.marker.y);
         this.scene.drawItems();
+        this.scene.setArrowVisibility();
+    }
+
+    setArrowVisibility()
+    {
+        this.arrowUp.setVisible(this.startingCol > 0);
+
+        this.arrowDown.setVisible( !(this.startingCol === this. maxY()) );
     }
 
     arrowOvered()
@@ -280,7 +293,7 @@ export default class Inventory extends Phaser.Scene
 
     withoutRemainder(pointer, relX, relY, d)
     {
-        const {itemsPerRow, rowAmount, percent, distance} = this.scene;
+        const {itemsPerRow, rowAmount, percent, distance, inventory, marker, offset} = this.scene;
     
             //testing:
             //rx = 26.1;
@@ -310,12 +323,28 @@ export default class Inventory extends Phaser.Scene
 
             console.log(`%cCell %c ${cell} %c(${realCell})`, "background-color: #337;", "color: #dd7;background-color: #557;", "color: #dd7;");
 
+            if (realCell < inventory.size)
+            {
+                this.scene.currentItem = [...inventory.keys()][realCell];
+                console.log(this.scene.currentItem.name);
+
+                marker.setPosition(offset + gridX * distance, offset + gridY * distance).setVisible(true);
+            }
+
+        }
+        else
+        {
+            marker.setVisible(false);
+            this.scene.currentItem = null;
         }
     }
     
 
     pressedZ()
     {
+        this.startingCol = this.maxY();
+        this.drawItems();
+        this.setArrowVisibility();
 
     }
 } // end class
