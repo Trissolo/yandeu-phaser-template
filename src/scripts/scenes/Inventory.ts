@@ -9,7 +9,7 @@ import GameItems from './sceneStuff/GameItems.mjs';
 
 export default class Inventory extends Phaser.Scene
 {
-    itemsPerRow:number = 7;
+    itemsPerRow:number = 5;
 
     rowAmount:number = 2;
 
@@ -43,51 +43,40 @@ export default class Inventory extends Phaser.Scene
 
     amountText: Phaser.GameObjects.BitmapText;
 
-    // gag : GameItem = GameItems.get(5);
 
     immy: Phaser.GameObjects.Image;
 
-    dynTexture: any | null; //Phaser.Textures.DynamicTexture | any | null | undefined;
+    // @ts-ignore
+    dynTexture; // : any | null; //Phaser.Textures.DynamicTexture | any | null | undefined;
 
     inventory = new Map<GameItem, number>();
 
-    currentItem = null;
+    currentItem:GameItem | null = null;
 
 
     constructor ()
     {
-        super({ key: 'Inventory', active: false });
+        super({ key: 'Inventory'}); // , active: false });
     }
 
     preload()
     {
-        this.load.atlas("itemsAtlas", "inv_atlas_test.png", "inv_atlas_test.json")
+        this.load.atlas("itemsAtlas", "inv_atlas_test.png", "inv_atlas_test.json");
+
         this.load.xml('tinyNumbersXML', 'font_inv.xml');
+
         this.load.once('complete', () => { Phaser.GameObjects.BitmapText.ParseFromAtlas(this, 'tinyNumbers', 'itemsAtlas', 'font_inv', 'tinyNumbersXML');})
     }
   
     create ()
     {
-        // this.text = this.add.bitmapText(4, 8, "tinyNumbers", "1%2340955").setOrigin(0);
+        // @ts-ignore
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, 5)); // GameItems.size - 1)); // this.itemsPerRow));
 
-        // this.add.image(24, 35, 'itemsAtlas', this.gag.frame);
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, 4));
+        
 
-        // this.player = this.add.triangle(11, 118, 4, 16, 0, 0, 8, 0, 0xbbbb88)//0xdb78ca)
-        //     .setOrigin(0.5, 1)
-        //     .setDepth(2);
-
-        // console.log(this.gag);
-
-        // this.inventory.set(GameItems.get(22), 2);
-        // this.addItem(4, 21);//.addMultiple([0,1,2,3,5,6,7,8,9,10,11,12,13,21]).loseItem(4).addItem(13,789);
-        this.addMultiple(Phaser.Utils.Array.NumberArray(0, GameItems.size - 1)); // this.itemsPerRow));
-
-        console.log("INVEEEEEEEEEEEEEEEEEE:", this.inventory);
-
-        //console.dir(GameItems);
-
-        //console.dir(this.textures.addDynamicTexture);
-
+        // @ts-ignore
         this.dynTexture = this.textures.addDynamicTexture("DT", this.itemsPerRow * this.distance, this.rowAmount * this.distance).fill(0x33dd55, 0.6);
 
         this.immy = this.add.image(this.offset, this.offset, 'DT')
@@ -97,7 +86,7 @@ export default class Inventory extends Phaser.Scene
 
         this.arrowUp = this.add.image(248, 9, 'itemsAtlas', "inventory_arrow_up")
                       .setInteractive()
-                      .setState(0)
+                    //   .setState(0)
                       .on("pointerdown", this.clickedArrow)
                       .on("pointerover", this.arrowOvered)
                       .on("pointerout", this.arrowOut)
@@ -120,25 +109,20 @@ export default class Inventory extends Phaser.Scene
         this.drawItems();
         this.setArrowVisibility();
 
+        // @ts-ignore
         this.input.keyboard.on("keydown-Z", this.pressedZ, this);
 
-        
-
-       
     } // end 'create' method
 
     drawItems()
     {
         const {startingCol, distance, slotsAmount, itemsPerRow, dynTexture, amountText, inventory} = this;
 
-        dynTexture.clear();
-
+        
         const invAry = [...inventory.keys()];
-
-        // console.log("invAry!!!!!!!!!!!!!!!!", invAry);
-
-        //dynTexture.clear();
-
+        
+        dynTexture.clear();
+        
         dynTexture.fill(0x33dd55, 0.6);
 
         dynTexture.beginDraw()
@@ -148,8 +132,8 @@ export default class Inventory extends Phaser.Scene
         let y = 0;
 
         const maxX = distance * itemsPerRow;
-        let item;
-        let owned;
+        let item: GameItem | null;
+        let owned: number;
 
         //hmmm limit
         const limit = Math.min(slotsAmount, inventory.size - itemsPerRow * startingCol);
@@ -157,7 +141,7 @@ export default class Inventory extends Phaser.Scene
 
         for (let slot = 0; slot < limit; slot++)
         {
-            console.log(`Drawing slot# ${slot} of ${limit}`);
+            // console.log(`Drawing slot# ${slot} of ${limit}`);
 
             if (x === maxX) //slot === itemsPerRow)
             {
@@ -173,6 +157,7 @@ export default class Inventory extends Phaser.Scene
 
             dynTexture.batchDrawFrame('itemsAtlas', item.frame, x, y);
 
+            // @ts-ignore
             owned = inventory.get(item);
 
             // console.log("How many?", inventory.get(item));
@@ -203,12 +188,13 @@ export default class Inventory extends Phaser.Scene
 
     clickedArrow()
     {
+        // @ts-ignore
         console.log("Current StartingCol", this.scene.startingCol, this.state);
 
         // arrowUp has state===0, arrowDown has state === 1
         if (this.state === 0)
         {
-            console.log("Arrow UP");
+            // console.log("Arrow UP");
             this.scene.startingCol = Math.max(0, this.scene.startingCol - 1);
             this.scene.marker.y += this.scene.distance;
         // this.scene.decCol()
@@ -217,7 +203,7 @@ export default class Inventory extends Phaser.Scene
         }
         else
         {
-            console.log("Arrow Down");
+            // console.log("Arrow Down");
             this.scene.startingCol = Math.min(this.scene.startingCol + 1 , this.scene.maxY());
             this.scene.marker.y -= this.scene.distance;
         // this.scene.incCol()
@@ -225,7 +211,7 @@ export default class Inventory extends Phaser.Scene
         // this.scene.marker.y -= this.scene.distance
         }
 
-        console.log("Drawing.from:", this.scene.startingCol, this.scene.marker.y);
+        // console.log("Drawing.from:", this.scene.startingCol, this.scene.marker.y);
         this.scene.drawItems();
         this.scene.setArrowVisibility();
     }
@@ -273,9 +259,9 @@ export default class Inventory extends Phaser.Scene
         return this;
     }
 
-    loseItem(id: number, inv = this.inventory)
+    loseItem(id: number | GameItem, inv = this.inventory)
     {
-        const item:GameItem = GameItems.get(id);
+        const item:GameItem = typeof id === "number"? GameItems.get(id): id;
 
         if (inv.has(item))
         {
@@ -291,26 +277,38 @@ export default class Inventory extends Phaser.Scene
         // }
     }
 
+    getItemByIdx(wanted:number, inv = this.inventory)
+    {
+        let i:number = 0;
+
+        for (const item of inv.keys())
+        {
+            if (i++ === wanted)
+            {
+                return item;
+            }
+        }
+
+        console.error(`Item (at [${wanted}]) not found. Inventory.size was ${inv.size}`, inv);
+
+        return null;
+    }
+
     withoutRemainder(pointer, relX, relY, d)
     {
         const {itemsPerRow, rowAmount, percent, distance, inventory, marker, offset} = this.scene;
     
-            //testing:
-            //rx = 26.1;
-            //ry = 26.1;
-            //
-
             const rx = relX / distance;
             const ry = relY / distance;
 
             const gridX = Math.floor(rx);
             const gridY = Math.floor(ry);
             
-            console.log("---TEST---", arguments);
-            console.log(`relX: ${relX}\nrelY: ${relY}`);
-            console.log(`gridX: ${gridX}\ngridY: ${gridY}`);
+            // console.log("---TEST---", arguments);
+            // console.log(`relX: ${relX}\nrelY: ${relY}`);
+            // console.log(`gridX: ${gridX}\ngridY: ${gridY}`);
 
-            console.log(`alloX: ${rx - gridX}\nalloY: ${ry - gridY}`);
+            // console.log(`alloX: ${rx - gridX}\nalloY: ${ry - gridY}`);
 
 
 
@@ -325,25 +323,95 @@ export default class Inventory extends Phaser.Scene
 
             if (realCell < inventory.size)
             {
-                this.scene.currentItem = [...inventory.keys()][realCell];
-                console.log(this.scene.currentItem.name);
+                // this.scene.currentItem = [...inventory.keys()][realCell];
+                
+                /*this.scene.currentItem*/ const clickedItem = this.scene.getItemByIdx(realCell, inventory);
+                
+                // console.log(this.scene.currentItem.name);
 
-                marker.setPosition(offset + gridX * distance, offset + gridY * distance).setVisible(true);
+                // marker.setPosition(offset + gridX * distance, offset + gridY * distance).setVisible(true);
+                
+                this.scene.manageClickedItem(clickedItem, gridX, gridY, distance, offset);
             }
 
         }
         else
         {
-            marker.setVisible(false);
-            this.scene.currentItem = null;
+            this.scene.setNoItem();
+            // marker.setVisible(false);
+
+            // this.scene.currentItem = null;
         }
+    }
+
+    manageClickedItem(clickedItem, gridX, gridY, distance, offset)
+    {
+        if (this.currentItem === clickedItem)
+        {
+            console.log("Deselect Item(was:)", clickedItem);
+            return this.setNoItem();
+        }
+        
+        else if (this.currentItem === null)
+        {
+            console.log("SELECT ITEM", clickedItem);
+            
+            this.currentItem = clickedItem;
+
+            this.marker.setPosition(offset + gridX * distance, offset + gridY * distance).setVisible(true);
+        }
+
+
+        else
+        {
+            //hardcoded Combine items
+            const prevItem = this.currentItem;
+
+            const minId = Math.min(prevItem.id, clickedItem.id);
+
+            const maxId = Math.max(prevItem.id, clickedItem.id);
+
+            // Radish + Apple = Rice Ball
+            if (minId === 2 && maxId === 3)
+            {
+                console.log("Combine ITEM", clickedItem);
+
+
+                this.loseItem(prevItem);
+                this.loseItem(clickedItem.id);
+                this.addItem(36, 1, this.inventory);
+                this.setNoItem();
+                this.drawItems();
+            }
+
+            else
+            {
+                console.log("SELECT ITEM", clickedItem);
+            
+                this.currentItem = clickedItem;
+
+                this.marker.setPosition(offset + gridX * distance, offset + gridY * distance).setVisible(true);
+            }
+
+        }
+    }
+
+    setNoItem()
+    {
+        this.currentItem = null;
+        
+        this.marker.setVisible(false);
     }
     
 
     pressedZ()
     {
+        console.log(`****CurrentItem: ${this.currentItem === null? "---" : this.currentItem.name} ****`);
+
         this.startingCol = this.maxY();
+
         this.drawItems();
+
         this.setArrowVisibility();
 
     }
