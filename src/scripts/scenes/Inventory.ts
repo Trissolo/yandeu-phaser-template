@@ -53,6 +53,8 @@ export default class Inventory extends Phaser.Scene
 
     currentItem:GameItem | null = null;
 
+    testArbitraryMaxY:number = 0;
+
 
     constructor ()
     {
@@ -71,9 +73,11 @@ export default class Inventory extends Phaser.Scene
     create ()
     {
         // @ts-ignore
-        this.addMultiple(Phaser.Utils.Array.NumberArray(0, 5)); // GameItems.size - 1)); // this.itemsPerRow));
+        this.addMultiple(Phaser.Utils.Array.NumberArray(0, GameItems.size - 1)); // this.itemsPerRow));
 
         this.addMultiple(Phaser.Utils.Array.NumberArray(0, 4));
+
+        this.addItem(3);
         
 
         // @ts-ignore
@@ -178,11 +182,15 @@ export default class Inventory extends Phaser.Scene
     maxY()
     {
         // return Math.max(0, Math.floor( (this.getInv().length - 1) / this.itemsPerRow) - 1);
-        console.log("Inventory.size:", this.inventory.size)
+
+
+        // console.log("Inventory.size:", this.inventory.size)
         // console.log("MaxY", this.inventory.size - this.startingCol * this.itemsPerRow - this.itemsPerRow);
 
         const maxStartingCol = Math.max(0, Math.ceil(this.inventory.size / this.itemsPerRow) - this.rowAmount);
-        console.log("MaxY", maxStartingCol);
+
+        // console.log("MaxY", maxStartingCol);
+
         return maxStartingCol;
     }
 
@@ -277,7 +285,7 @@ export default class Inventory extends Phaser.Scene
         // }
     }
 
-    getItemByIdx(wanted:number, inv = this.inventory)
+    getItemByInvIdx(wanted:number, inv = this.inventory)
     {
         let i:number = 0;
 
@@ -290,6 +298,23 @@ export default class Inventory extends Phaser.Scene
         }
 
         console.error(`Item (at [${wanted}]) not found. Inventory.size was ${inv.size}`, inv);
+
+        return null;
+    }
+
+    getInventoryIdxOf(wantedItem:GameItem, inv = this.inventory)
+    {
+        let idx:number = 0;
+
+        for (const item of inv.keys())
+        {
+            if (item === wantedItem)
+            {
+                return idx;
+            }
+
+            idx += 1;
+        }
 
         return null;
     }
@@ -325,7 +350,7 @@ export default class Inventory extends Phaser.Scene
             {
                 // this.scene.currentItem = [...inventory.keys()][realCell];
                 
-                /*this.scene.currentItem*/ const clickedItem = this.scene.getItemByIdx(realCell, inventory);
+                /*this.scene.currentItem*/ const clickedItem = this.scene.getItemByInvIdx(realCell, inventory);
                 
                 // console.log(this.scene.currentItem.name);
 
@@ -406,13 +431,49 @@ export default class Inventory extends Phaser.Scene
 
     pressedZ()
     {
-        console.log(`****CurrentItem: ${this.currentItem === null? "---" : this.currentItem.name} ****`);
+        console.log(`**** CurrentItem: %c${this.currentItem === null? "---" : this.currentItem.name}`, "color: #775;", "****", this.marker.x, this.marker.y);
 
-        this.startingCol = this.maxY();
+        // this.startingCol = this.maxY();
+
+        // this.drawItems();
+
+        // this.setArrowVisibility();
+
+        //test identify and select item FROM 'inventory index':
+
+        const idx = Phaser.Math.Between(0, GameItems.size -1);
+
+        const invPosition = this.getInventoryIdxOf(GameItems.get(idx));
+
+        console.log(invPosition, invPosition % this.itemsPerRow);
+        console.log(invPosition, invPosition / this.itemsPerRow);
+
+        const itemCoords = Phaser.Math.ToXY(invPosition, this.itemsPerRow, Math.ceil(this.inventory.size / this.itemsPerRow));
+        console.log(itemCoords);
+        let yyy = itemCoords.y // Math.min (itemCoords.y, this.maxY());
+        console.log(this.startingCol, this.maxY());
+
+        //this.startingCol = yyy;
+
+        this.marker.x = this.offset + itemCoords.x * this.distance;
+        this.marker.y = this.offset;
+        this.startingCol = yyy;
+        
+        if ((yyy & 1) === 1)
+        {
+            this.startingCol -= 1;
+            this.marker.y += this.distance;
+        }
+
+        this.marker.setVisible(true);
 
         this.drawItems();
 
         this.setArrowVisibility();
+
+        this.currentItem = this.getItemByInvIdx(invPosition);
+        console.log(`- ${idx} --> **** %c(${this.currentItem.id}) ${this.currentItem === null? "---" : this.currentItem.name}`, "color: #775;", "****", this.marker.x, this.marker.y);
+
 
     }
 } // end class
